@@ -66,7 +66,7 @@ SCSI_Inquiry_Response_t InquiryData =
 		.RelAddr             = false,
 
 		.VendorID            = "ShinKen",
-		.ProductID           = "Teensy Storage", // 16 characters max
+		.ProductID           = "N64 Cartridge", // 16 characters max
 		.RevisionID          = {'0','.','0','0'},
 	};
 
@@ -88,13 +88,18 @@ SCSI_Request_Sense_Response_t SenseData =
  *
  *  \return Boolean true if the command completed successfully, false otherwise
  */
-bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
-{
+bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo) {
 	bool CommandSuccess = false;
 
 	/* Run the appropriate SCSI command hander function based on the passed command */
-	switch (MSInterfaceInfo->State.CommandBlock.SCSICommandData[0])
-	{
+	switch (MSInterfaceInfo->State.CommandBlock.SCSICommandData[0]) {
+		/* Make this device read-only */
+		//case SCSI_CMD_WRITE_10:
+		//	CommandSuccess = SCSI_Command_ReadWrite_10(MSInterfaceInfo, DATA_WRITE);
+		//	break;
+		case SCSI_CMD_READ_10:
+			CommandSuccess = SCSI_Command_ReadWrite_10(MSInterfaceInfo, DATA_READ);
+			break;
 		case SCSI_CMD_INQUIRY:
 			CommandSuccess = SCSI_Command_Inquiry(MSInterfaceInfo);
 			break;
@@ -106,12 +111,6 @@ bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
 			break;
 		case SCSI_CMD_SEND_DIAGNOSTIC:
 			CommandSuccess = SCSI_Command_Send_Diagnostic(MSInterfaceInfo);
-			break;
-		case SCSI_CMD_WRITE_10:
-			CommandSuccess = SCSI_Command_ReadWrite_10(MSInterfaceInfo, DATA_WRITE);
-			break;
-		case SCSI_CMD_READ_10:
-			CommandSuccess = SCSI_Command_ReadWrite_10(MSInterfaceInfo, DATA_READ);
 			break;
 		case SCSI_CMD_TEST_UNIT_READY:
 		case SCSI_CMD_PREVENT_ALLOW_MEDIUM_REMOVAL:
@@ -129,8 +128,7 @@ bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
 	}
 
 	/* Check if command was successfully processed */
-	if (CommandSuccess)
-	{
+	if (CommandSuccess) {
 		SCSI_SET_SENSE(SCSI_SENSE_KEY_GOOD,
 		               SCSI_ASENSE_NO_ADDITIONAL_INFORMATION,
 		               SCSI_ASENSEQ_NO_QUALIFIER);
@@ -148,16 +146,14 @@ bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
  *
  *  \return Boolean true if the command completed successfully, false otherwise.
  */
-static bool SCSI_Command_Inquiry(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
-{
+static bool SCSI_Command_Inquiry(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo) {
 	uint16_t AllocationLength  = SwapEndian_16(*(uint16_t*)&MSInterfaceInfo->State.CommandBlock.SCSICommandData[3]);
 	uint16_t BytesTransferred  = (AllocationLength < sizeof(InquiryData))? AllocationLength :
 	                                                                       sizeof(InquiryData);
 
 	/* Only the standard INQUIRY data is supported, check if any optional INQUIRY bits set */
 	if ((MSInterfaceInfo->State.CommandBlock.SCSICommandData[1] & ((1 << 0) | (1 << 1))) ||
-	     MSInterfaceInfo->State.CommandBlock.SCSICommandData[2])
-	{
+	     MSInterfaceInfo->State.CommandBlock.SCSICommandData[2]) {
 		/* Optional but unsupported bits set - update the SENSE key and fail the request */
 		SCSI_SET_SENSE(SCSI_SENSE_KEY_ILLEGAL_REQUEST,
 		               SCSI_ASENSE_INVALID_FIELD_IN_CDB,
@@ -189,8 +185,7 @@ static bool SCSI_Command_Inquiry(USB_ClassInfo_MS_Device_t* const MSInterfaceInf
  *
  *  \return Boolean true if the command completed successfully, false otherwise.
  */
-static bool SCSI_Command_Request_Sense(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
-{
+static bool SCSI_Command_Request_Sense(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo) {
 	uint8_t  AllocationLength = MSInterfaceInfo->State.CommandBlock.SCSICommandData[4];
 	uint8_t  BytesTransferred = (AllocationLength < sizeof(SenseData))? AllocationLength : sizeof(SenseData);
 
@@ -213,12 +208,11 @@ static bool SCSI_Command_Request_Sense(USB_ClassInfo_MS_Device_t* const MSInterf
  *
  *  \return Boolean true if the command completed successfully, false otherwise.
  */
-static bool SCSI_Command_Read_Capacity_10(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
-{
-	uint32_t LastBlockAddressInLUN = (LUN_MEDIA_BLOCKS - 1);
-	uint32_t MediaBlockSize        = VIRTUAL_MEMORY_BLOCK_SIZE;
+static bool SCSI_Command_Read_Capacity_10(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo) {
+	uint32_t LastBlockAddress = currentCartInfo.size - 1;
+	uint32_t MediaBlockSize = VIRTUAL_MEMORY_BLOCK_SIZE;
 
-	Endpoint_Write_Stream_BE(&LastBlockAddressInLUN, sizeof(LastBlockAddressInLUN), NO_STREAM_CALLBACK);
+	Endpoint_Write_Stream_BE(&LastBlockAddress, sizeof(LastBlockAddress), NO_STREAM_CALLBACK);
 	Endpoint_Write_Stream_BE(&MediaBlockSize, sizeof(MediaBlockSize), NO_STREAM_CALLBACK);
 	Endpoint_ClearIN();
 
@@ -236,11 +230,9 @@ static bool SCSI_Command_Read_Capacity_10(USB_ClassInfo_MS_Device_t* const MSInt
  *
  *  \return Boolean true if the command completed successfully, false otherwise.
  */
-static bool SCSI_Command_Send_Diagnostic(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
-{
+static bool SCSI_Command_Send_Diagnostic(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo) {
 	/* Check to see if the SELF TEST bit is not set */
-	if (!(MSInterfaceInfo->State.CommandBlock.SCSICommandData[1] & (1 << 2)))
-	{
+	if (!(MSInterfaceInfo->State.CommandBlock.SCSICommandData[1] & (1 << 2))) {
 		/* Only self-test supported - update SENSE key and fail the command */
 		SCSI_SET_SENSE(SCSI_SENSE_KEY_ILLEGAL_REQUEST,
 		               SCSI_ASENSE_INVALID_FIELD_IN_CDB,
@@ -250,8 +242,7 @@ static bool SCSI_Command_Send_Diagnostic(USB_ClassInfo_MS_Device_t* const MSInte
 	}
 
 	/* Check to see if all attached Dataflash ICs are functional */
-	if (!(DataflashManager_CheckDataflashOperation()))
-	{
+	if (!(DataflashManager_CheckDataflashOperation())) {
 		/* Update SENSE key with a hardware error condition and return command fail */
 		SCSI_SET_SENSE(SCSI_SENSE_KEY_HARDWARE_ERROR,
 		               SCSI_ASENSE_NO_ADDITIONAL_INFORMATION,
@@ -276,8 +267,7 @@ static bool SCSI_Command_Send_Diagnostic(USB_ClassInfo_MS_Device_t* const MSInte
  *  \return Boolean true if the command completed successfully, false otherwise.
  */
 static bool SCSI_Command_ReadWrite_10(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo,
-                                      const bool IsDataRead)
-{
+                                      const bool IsDataRead) {
 	uint32_t BlockAddress;
 	uint16_t TotalBlocks;
 
@@ -287,9 +277,8 @@ static bool SCSI_Command_ReadWrite_10(USB_ClassInfo_MS_Device_t* const MSInterfa
 	/* Load in the 16-bit total blocks (SCSI uses big-endian, so have to reverse the byte order) */
 	TotalBlocks  = SwapEndian_16(*(uint16_t*)&MSInterfaceInfo->State.CommandBlock.SCSICommandData[7]);
 
-	/* Check if the block address is outside the maximum allowable value for the LUN */
-	if (BlockAddress >= LUN_MEDIA_BLOCKS)
-	{
+	/* Check if the block address is outside the maximum allowable value */
+	if (BlockAddress >= currentCartInfo.size) {
 		/* Block address is invalid, update SENSE key and return command fail */
 		SCSI_SET_SENSE(SCSI_SENSE_KEY_ILLEGAL_REQUEST,
 		               SCSI_ASENSE_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE,
@@ -298,16 +287,9 @@ static bool SCSI_Command_ReadWrite_10(USB_ClassInfo_MS_Device_t* const MSInterfa
 		return false;
 	}
 
-	#if (TOTAL_LUNS > 1)
-	/* Adjust the given block address to the real media address based on the selected LUN */
-	BlockAddress += ((uint32_t)MSInterfaceInfo->State.CommandBlock.LUN * LUN_MEDIA_BLOCKS);
-	#endif
-
 	/* Determine if the packet is a READ (10) or WRITE (10) command, call appropriate function */
 	if (IsDataRead == DATA_READ)
 	  DataflashManager_ReadBlocks(MSInterfaceInfo, BlockAddress, TotalBlocks);
-	else
-	  DataflashManager_WriteBlocks(MSInterfaceInfo, BlockAddress, TotalBlocks);
 
 	/* Update the bytes transferred counter and succeed the command */
 	MSInterfaceInfo->State.CommandBlock.DataTransferLength -= ((uint32_t)TotalBlocks * VIRTUAL_MEMORY_BLOCK_SIZE);
