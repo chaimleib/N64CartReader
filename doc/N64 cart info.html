@@ -1,0 +1,524 @@
+
+<!-- saved from url=(0044)http://crazynation.org/N64/n64_cart_info.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<meta name="GENERATOR" content="">
+<title>N64 cart info</title>
+</head>
+
+<body bgcolor="#000000" text="#00FFFF">
+
+<p><a href="http://crazynation.org/N64/n64_cart_info.htm#PIF Pinout:"><font face="Arial">-N64 CART Info-</font></a></p>
+
+<p><a name="Bus timing:"><font face="Arial">Bus timing:</font></a></p>
+
+<table border="1">
+    <tbody><tr>
+        <td>ALE_L</td>
+        <td>ALE_H</td>
+        <td>AD</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>Cart address (upper 16 bits 0x10xx)</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>0</td>
+        <td>Cart address (lower 16 bits)</td>
+    </tr>
+</tbody></table>
+
+<p><font face="Arial">Typical in game bus activity:<br>
+<img src="./N64 cart info_files/n64_cart_timing.gif" width="999" height="242"><br>
+AD is valid on the falling edge of ale_x<br>
+<img src="./N64 cart info_files/long_access.gif" width="1970" height="235"><br>
+At most 256 words are transmitted between ALE_L</font></p>
+
+<p>&nbsp;</p>
+
+<p>First boot:<br>
+<img src="./N64 cart info_files/first_boot.gif" width="2048" height="241"><br>
+The first word read is in the cart header address 0 [0x80371240]
+which sets the bus speed for subsequent cart access.<br>
+byte 0:device latency<br>
+byte 1:release<br>
+byte 2: pulse width<br>
+byte 3:page size<br>
+If you set it to 0x8037FF40 then the access timings for loading
+the boot code at 0x40 in the header would look like the first
+access at 0, where the read low signal was 4.0us. Can be useful
+for debugging since all bus activity is slowed down but still
+functional.</p>
+
+<p>&nbsp;</p>
+
+<p><a name="Cart Edge Pinout:">Cart Edge Pinout:</a></p>
+
+<table border="1" cellpadding="3" cellspacing="1">
+    <tbody><tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td align="center"><font face="Fixedsys">1</font></td>
+        <td align="center"><font face="Fixedsys">26</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td align="center"><font face="Fixedsys">2</font></td>
+        <td align="center"><font face="Fixedsys">27</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD15</font></td>
+        <td align="center"><font face="Fixedsys">3</font></td>
+        <td align="center"><font face="Fixedsys">28</font></td>
+        <td><font face="Fixedsys">AD0</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD14</font></td>
+        <td align="center"><font face="Fixedsys">4</font></td>
+        <td align="center"><font face="Fixedsys">29</font></td>
+        <td><font face="Fixedsys">AD1</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD13</font></td>
+        <td align="center"><font face="Fixedsys">5</font></td>
+        <td align="center"><font face="Fixedsys">30</font></td>
+        <td><font face="Fixedsys">AD2</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td align="center"><font face="Fixedsys">6</font></td>
+        <td align="center"><font face="Fixedsys">31</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD12</font></td>
+        <td align="center"><font face="Fixedsys">7</font></td>
+        <td align="center"><font face="Fixedsys">32</font></td>
+        <td><font face="Fixedsys">AD3</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">/write</font></td>
+        <td align="center"><font face="Fixedsys">8</font></td>
+        <td align="center"><font face="Fixedsys">33</font></td>
+        <td><font face="Fixedsys">ALE_L</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">VCC</font></td>
+        <td align="center"><font face="Fixedsys">9</font></td>
+        <td align="center"><font face="Fixedsys">34</font></td>
+        <td><font face="Fixedsys">VCC</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">/read</font></td>
+        <td align="center"><font face="Fixedsys">10</font></td>
+        <td align="center"><font face="Fixedsys">35</font></td>
+        <td><font face="Fixedsys">ALEL_H</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD11</font></td>
+        <td align="center"><font face="Fixedsys">11</font></td>
+        <td align="center"><font face="Fixedsys">36</font></td>
+        <td><font face="Fixedsys">AD4</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD10</font></td>
+        <td align="center"><font face="Fixedsys">12</font></td>
+        <td align="center"><font face="Fixedsys">37</font></td>
+        <td><font face="Fixedsys">AD5</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">12V</font></td>
+        <td align="center"><font face="Fixedsys">13</font></td>
+        <td align="center"><font face="Fixedsys">38</font></td>
+        <td><font face="Fixedsys">12V</font></td>
+    </tr>
+    <tr>
+        <td align="right">&nbsp;</td>
+        <td align="center"><font face="Fixedsys">14</font></td>
+        <td align="center"><font face="Fixedsys">39</font></td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD9</font></td>
+        <td align="center"><font face="Fixedsys">15</font></td>
+        <td align="center"><font face="Fixedsys">40</font></td>
+        <td><font face="Fixedsys">AD6</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">AD8</font></td>
+        <td align="center"><font face="Fixedsys">16</font></td>
+        <td align="center"><font face="Fixedsys">41</font></td>
+        <td><font face="Fixedsys">AD7</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">VCC</font></td>
+        <td align="center"><font face="Fixedsys">17</font></td>
+        <td align="center"><font face="Fixedsys">42</font></td>
+        <td><font face="Fixedsys">VCC</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">CIC(15)_TO_PIF</font></td>
+        <td align="center"><font face="Fixedsys">18</font></td>
+        <td align="center"><font face="Fixedsys">43</font></td>
+        <td><font face="Fixedsys">PIF_TO_CIC(14)</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">1.6MHZ</font></td>
+        <td align="center"><font face="Fixedsys">19</font></td>
+        <td align="center"><font face="Fixedsys">44</font></td>
+        <td><font face="Fixedsys">JTAG_CLK_R4300</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">/COLD_RESET</font></td>
+        <td align="center"><font face="Fixedsys">20</font></td>
+        <td align="center"><font face="Fixedsys">45</font></td>
+        <td><font face="Fixedsys">NMI_R4300</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">S_DAT</font></td>
+        <td align="center"><font face="Fixedsys">21</font></td>
+        <td align="center"><font face="Fixedsys">46</font></td>
+        <td><font face="Fixedsys">VIDEO_CLK(pin14_vdc)</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td align="center"><font face="Fixedsys">22</font></td>
+        <td align="center"><font face="Fixedsys">47</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td align="center"><font face="Fixedsys">23</font></td>
+        <td align="center"><font face="Fixedsys">48</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">LAUDIO</font></td>
+        <td align="center"><font face="Fixedsys">24</font></td>
+        <td align="center"><font face="Fixedsys">49</font></td>
+        <td><font face="Fixedsys">RAUDIO</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td align="center"><font face="Fixedsys">25</font></td>
+        <td align="center"><font face="Fixedsys">50</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+</tbody></table>
+
+<p>VCC=3.3V<br>
+looking from the top of the console: pin 1 is left front, pin 26
+is left rear</p>
+
+<hr>
+
+<p><font face="Fixedsys"><br>
+</font><a name="CIC PINOUT"><font face="Fixedsys">CIC PINOUT</font></a></p>
+
+<table border="1" cellspacing="1">
+    <tbody><tr>
+        <td><font face="Fixedsys">VCC</font></td>
+        <td><font face="Fixedsys">1</font></td>
+        <td><font face="Fixedsys">16</font></td>
+        <td><font face="Fixedsys">VCC</font></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">2</font></td>
+        <td><font face="Fixedsys">15</font></td>
+        <td><font face="Fixedsys">DATA_OUT</font></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">3</font></td>
+        <td><font face="Fixedsys">14</font></td>
+        <td><font face="Fixedsys">DATA_IN</font></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">4</font></td>
+        <td><font face="Fixedsys">13</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">5</font></td>
+        <td><font face="Fixedsys">12</font></td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">GND</font></td>
+        <td><font face="Fixedsys">6</font></td>
+        <td><font face="Fixedsys">11</font></td>
+        <td><font face="Fixedsys">CLK(~1.5MHZ)</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">GND</font></td>
+        <td><font face="Fixedsys">7</font></td>
+        <td><font face="Fixedsys">10</font></td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">GND</font></td>
+        <td><font face="Fixedsys">8</font></td>
+        <td><font face="Fixedsys">9</font></td>
+        <td><font face="Fixedsys">/COLD_RESET</font></td>
+    </tr>
+</tbody></table>
+
+<p><font face="Fixedsys"><br>
+</font><a name="EEPROM PINOUT"><font face="Fixedsys">EEPROM
+PINOUT</font></a></p>
+
+<table border="1" cellspacing="1">
+    <tbody><tr>
+        <td><font face="Fixedsys">GND</font></td>
+        <td><font face="Fixedsys">1</font></td>
+        <td><font face="Fixedsys">8</font></td>
+        <td><font face="Fixedsys">VCC</font></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">2</font></td>
+        <td><font face="Fixedsys">7</font></td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">CLK</font></td>
+        <td><font face="Fixedsys">3</font></td>
+        <td><font face="Fixedsys">6</font></td>
+        <td><font face="Fixedsys">/COLD_RESET</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">GND</font></td>
+        <td><font face="Fixedsys">4</font></td>
+        <td><font face="Fixedsys">5</font></td>
+        <td><font face="Fixedsys">DATA</font></td>
+    </tr>
+</tbody></table>
+
+<p><font face="Fixedsys"><br>
+</font><a name="CART ROM PINOUT"><font face="Fixedsys">CART ROM
+PINOUT</font></a></p>
+
+<table border="1" cellspacing="1">
+    <tbody><tr>
+        <td><font face="Fixedsys">AD0</font></td>
+        <td><font face="Fixedsys">1</font></td>
+        <td><font face="Fixedsys">28</font></td>
+        <td><font face="Fixedsys">AD15</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">AD1</font></td>
+        <td><font face="Fixedsys">2</font></td>
+        <td><font face="Fixedsys">27</font></td>
+        <td><font face="Fixedsys">AD14</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">AD2</font></td>
+        <td><font face="Fixedsys">3</font></td>
+        <td><font face="Fixedsys">26</font></td>
+        <td><font face="Fixedsys">AD13</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">AD3</font></td>
+        <td><font face="Fixedsys">4</font></td>
+        <td><font face="Fixedsys">25</font></td>
+        <td><font face="Fixedsys">AD12</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">VCC</font></td>
+        <td><font face="Fixedsys">5</font></td>
+        <td><font face="Fixedsys">24</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">ALEL</font></td>
+        <td><font face="Fixedsys">6</font></td>
+        <td><font face="Fixedsys">23</font></td>
+        <td><font face="Fixedsys">GND</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">/READ</font></td>
+        <td><font face="Fixedsys">7</font></td>
+        <td><font face="Fixedsys">22</font></td>
+        <td><font face="Fixedsys">VCC</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">GND</font></td>
+        <td><font face="Fixedsys">8</font></td>
+        <td><font face="Fixedsys">21</font></td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">ALEH</font></td>
+        <td><font face="Fixedsys">9</font></td>
+        <td><font face="Fixedsys">20</font></td>
+        <td><font face="Fixedsys">/READ</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">GND</font></td>
+        <td><font face="Fixedsys">10</font></td>
+        <td><font face="Fixedsys">19</font></td>
+        <td><font face="Fixedsys">VCC</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">AD4</font></td>
+        <td><font face="Fixedsys">11</font></td>
+        <td><font face="Fixedsys">18</font></td>
+        <td><font face="Fixedsys">AD11</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">AD5</font></td>
+        <td><font face="Fixedsys">12</font></td>
+        <td><font face="Fixedsys">17</font></td>
+        <td><font face="Fixedsys">AD10</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">AD6</font></td>
+        <td><font face="Fixedsys">13</font></td>
+        <td><font face="Fixedsys">16</font></td>
+        <td><font face="Fixedsys">AD9</font></td>
+    </tr>
+    <tr>
+        <td><font face="Fixedsys">AD7</font></td>
+        <td><font face="Fixedsys">14</font></td>
+        <td><font face="Fixedsys">15</font></td>
+        <td><font face="Fixedsys">AD8</font></td>
+    </tr>
+</tbody></table>
+
+<hr>
+
+<p><a name="PIF Pinout:">PIF Pinout:</a></p>
+
+<table border="1" cellspacing="1">
+    <tbody><tr>
+        <td align="right"><font face="Fixedsys">CLK(cic/eeprom)(~1.9Mhz)</font></td>
+        <td><font face="Fixedsys">O</font></td>
+        <td><font face="Fixedsys">1</font></td>
+        <td><font face="Fixedsys">28</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">VCC</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">RC_power_on_reset[1]</font></td>
+        <td><font face="Fixedsys">I</font></td>
+        <td><font face="Fixedsys">2</font></td>
+        <td><font face="Fixedsys">27</font></td>
+        <td><font face="Fixedsys">I</font></td>
+        <td><font face="Fixedsys">/RESET_Switch</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">DATA_TO_CIC</font></td>
+        <td><font face="Fixedsys">O</font></td>
+        <td><font face="Fixedsys">3</font></td>
+        <td><font face="Fixedsys">26</font></td>
+        <td>&nbsp;</td>
+        <td>no connect</td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">output_reset_ind[3]</font></td>
+        <td><font face="Fixedsys">O</font></td>
+        <td><font face="Fixedsys">4</font></td>
+        <td><font face="Fixedsys">25</font></td>
+        <td><font face="Fixedsys">O</font></td>
+        <td><font face="Fixedsys">INT2_R4300</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">DATA_FROM_CIC</font></td>
+        <td><font face="Fixedsys">I</font></td>
+        <td><font face="Fixedsys">5</font></td>
+        <td><font face="Fixedsys">24</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">EEPROM_DAT[2]</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">/COLD_RESET</font></td>
+        <td><font face="Fixedsys">O</font></td>
+        <td><font face="Fixedsys">6</font></td>
+        <td><font face="Fixedsys">23</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">EEPROM_DAT[2]</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">NMI_R4300</font></td>
+        <td><font face="Fixedsys">O</font></td>
+        <td><font face="Fixedsys">7</font></td>
+        <td><font face="Fixedsys">22</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">CONTROLER_4_DAT</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">enable_high[4]</font></td>
+        <td><font face="Fixedsys">I</font></td>
+        <td><font face="Fixedsys">8</font></td>
+        <td><font face="Fixedsys">21</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">contr_gate</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">PIF_DAT_CLK(~15Mhz)</font></td>
+        <td><font face="Fixedsys">I</font></td>
+        <td><font face="Fixedsys">9</font></td>
+        <td><font face="Fixedsys">20</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">CONTROLER_3_DAT</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">10</font></td>
+        <td><font face="Fixedsys">19</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">contr_gate</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">PIF_ADR</font></td>
+        <td><font face="Fixedsys">I</font></td>
+        <td><font face="Fixedsys">11</font></td>
+        <td><font face="Fixedsys">18</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">CONTROLER_2_DAT</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">12</font></td>
+        <td><font face="Fixedsys">17</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">contr_gate</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">PIF_DATA</font></td>
+        <td><font face="Fixedsys">O</font></td>
+        <td><font face="Fixedsys">13</font></td>
+        <td><font face="Fixedsys">16</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">CONTROLER_1_DAT</font></td>
+    </tr>
+    <tr>
+        <td align="right"><font face="Fixedsys">GND</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">14</font></td>
+        <td><font face="Fixedsys">15</font></td>
+        <td>&nbsp;</td>
+        <td><font face="Fixedsys">contr_gate</font></td>
+    </tr>
+</tbody></table>
+
+<p>[1]goes high then 160ms later cold_reset high<br>
+[2]eeprom dat is driven by both pins<br>
+[3]open drain pin driven with RC circuit(unknown/unused function)<br>
+[4]some enable output from rambus clock driver (always high)</p>
+
+<p><img src="./N64 cart info_files/pif_timing.gif" width="952" height="700"><br>
+<img src="./N64 cart info_files/pif_transx.gif" width="943" height="148"></p>
+
+<p>&nbsp;</p>
+
+
+</body><style type="text/css"></style></html>
